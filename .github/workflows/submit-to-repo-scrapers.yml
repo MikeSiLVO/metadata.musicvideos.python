@@ -1,0 +1,84 @@
+name: Submit to repo-scrapers
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch in repo-scrapers'
+        required: true
+        default: 'omega'
+      create_pr:
+        description: 'Create PR against xbmc/repo-scrapers (disabled until ready)'
+        type: boolean
+        default: false
+
+jobs:
+  submit:
+    name: Submit to repo-scrapers
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout addon
+        uses: actions/checkout@v4
+        with:
+          path: addon
+
+      - name: Get addon info
+        id: addon-info
+        run: |
+          sudo apt-get update && sudo apt-get install -y xmlstarlet
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon/addon.xml)
+          addon_id=$(xmlstarlet sel -t -v 'string(/addon/@id)' addon/addon.xml)
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "addon_id=$addon_id" >> $GITHUB_OUTPUT
+
+      - name: Clean addon export
+        run: |
+          cd addon
+          rm -rf .git .github .gitignore .gitattributes
+          rm -rf .claude .vscode .idea
+          rm -rf __pycache__ .mypy_cache .ruff_cache .pytest_cache
+          find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+          rm -f README.md CHANGELOG.md
+          rm -f .DS_Store Thumbs.db desktop.ini
+
+      - name: Checkout repo-scrapers fork
+        uses: actions/checkout@v4
+        with:
+          repository: MikeSiLVO/repo-scrapers
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.REPO_SCRAPERS_PAT }}
+          path: repo-scrapers
+
+      - name: Copy addon into repo-scrapers
+        run: |
+          addon_id=${{ steps.addon-info.outputs.addon_id }}
+          rm -rf "repo-scrapers/${addon_id}"
+          cp -r addon "repo-scrapers/${addon_id}"
+
+      - name: Commit and push
+        run: |
+          cd repo-scrapers
+          addon_id=${{ steps.addon-info.outputs.addon_id }}
+          version=${{ steps.addon-info.outputs.version }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${addon_id}"
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "[${addon_id}] v${version}"
+          git push
+
+      - name: Create upstream PR
+        if: ${{ inputs.create_pr == true }}
+        env:
+          GH_TOKEN: ${{ secrets.REPO_SCRAPERS_PAT }}
+        run: |
+          cd repo-scrapers
+          addon_id=${{ steps.addon-info.outputs.addon_id }}
+          version=${{ steps.addon-info.outputs.version }}
+          gh pr create \
+            --repo xbmc/repo-scrapers \
+            --base ${{ inputs.branch }} \
+            --head MikeSiLVO:${{ inputs.branch }} \
+            --title "[${addon_id}] ${version}" \
+            --body "Adds ${addon_id} v${version} to the ${{ inputs.branch }} branch."
