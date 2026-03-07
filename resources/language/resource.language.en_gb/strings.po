@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+msgid ""
+msgstr ""
+
+msgctxt "#32000"
+msgid "Metadata language"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Wikipedia plot"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Last.fm tags"
+msgstr ""
+
+msgctxt "#32100"
+msgid "fanart.tv"
+msgstr ""
+
+msgctxt "#32101"
+msgid "Fetch art from fanart.tv"
+msgstr ""
+
+msgctxt "#32102"
+msgid "Personal client key"
+msgstr ""
+
+msgctxt "#32200"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#32201"
+msgid "Verbose logging"
+msgstr ""
