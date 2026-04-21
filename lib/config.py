@@ -52,6 +52,7 @@ def get_settings():
         'fanarttv_clientkey': _str('fanarttv_key'),
         'enable_wiki': _bool('wiki_enabled', True),
         'lastfm_tags': _bool('lastfm_tags', True),
+        'filename_format': _str('filename_format', 'artist_track'),
         'verbose_log': _bool('log_verbose'),
     }
 

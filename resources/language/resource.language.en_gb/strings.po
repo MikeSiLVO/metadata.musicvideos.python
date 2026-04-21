@@ -36,6 +36,18 @@ msgctxt "#32002"
 msgid "Last.fm tags"
 msgstr ""
 
+msgctxt "#32003"
+msgid "Filename format"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Artist - Title"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Title - Artist"
+msgstr ""
+
 msgctxt "#32100"
 msgid "fanart.tv"
 msgstr ""

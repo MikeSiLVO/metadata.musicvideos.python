@@ -27,6 +27,19 @@
                         <heading>32000</heading>
                     </control>
                 </setting>
+                <setting id="filename_format" type="string" label="32003" help="">
+                    <level>0</level>
+                    <default>artist_track</default>
+                    <constraints>
+                        <options>
+                            <option label="32004">artist_track</option>
+                            <option label="32005">track_artist</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>32003</heading>
+                    </control>
+                </setting>
                 <setting id="wiki_enabled" type="boolean" label="32001" help="">
                     <level>0</level>
                     <default>true</default>

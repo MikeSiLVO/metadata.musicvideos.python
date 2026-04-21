@@ -78,10 +78,11 @@ def run_action(handle, action, params):
         xbmcplugin.endOfDirectory(handle)
 
 
-def _find(handle, params, _settings):
+def _find(handle, params, settings):
     """Search for matching tracks by filename."""
     title = params.get('title', '')
-    artist, track = _parse_title(title)
+    reverse = settings.get('filename_format') == 'track_artist'
+    artist, track = _parse_title(title, reverse=reverse)
 
     if not artist or not track:
         log.debug('find: could not parse artist/track from "{}"'.format(title))
@@ -254,8 +255,8 @@ def _nfo_url(handle, params):
     xbmcplugin.endOfDirectory(handle)
 
 
-def _parse_title(title):
-    """Split 'Artist - Track' from a filename."""
+def _parse_title(title, reverse=False):
+    """Split artist/track from a filename, honoring filename_format."""
     if not title:
         return '', ''
 
@@ -264,12 +265,21 @@ def _parse_title(title):
         if ext.lower() in _VIDEO_EXTENSIONS:
             title = base
 
-    parts = _RE_SEPARATOR.split(title, maxsplit=1)
-    if len(parts) < 2:
-        return '', title.strip()
-
-    artist = parts[0].strip()
-    track = _RE_NOISE.sub('', parts[1]).strip()
+    # A-T splits on first separator (track keeps trailing dashes);
+    # T-A splits on last (track keeps leading dashes)
+    if reverse:
+        match = list(_RE_SEPARATOR.finditer(title))
+        if not match:
+            return '', title.strip()
+        last = match[-1]
+        track = _RE_NOISE.sub('', title[:last.start()]).strip()
+        artist = title[last.end():].strip()
+    else:
+        parts = _RE_SEPARATOR.split(title, maxsplit=1)
+        if len(parts) < 2:
+            return '', title.strip()
+        artist = parts[0].strip()
+        track = _RE_NOISE.sub('', parts[1]).strip()
     return artist, track
 
 
