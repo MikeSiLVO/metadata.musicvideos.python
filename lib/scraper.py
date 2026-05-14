@@ -5,6 +5,7 @@
 import json
 import re
 import time
+import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import quote, unquote
 
@@ -48,6 +49,79 @@ _NFO_AUDIODB_URL = re.compile(
 )
 _NFO_AUDIODB_ID = re.compile(r'theaudiodb://(\d+)', re.IGNORECASE)
 
+_RE_AMP = re.compile(r'\s*&\s*')
+_RE_AND = re.compile(r'\s+and\s+', re.IGNORECASE)
+
+
+def _strip_diacritics(text):
+    if not text:
+        return text
+    nfkd = unicodedata.normalize('NFKD', text)
+    return ''.join(c for c in nfkd if not unicodedata.combining(c))
+
+
+def _query_variants(artist, track):
+    """Yield retry (artist, track) pairs after a search miss."""
+    seen = {(artist.lower(), track.lower())}
+
+    candidates = [(_strip_diacritics(artist), _strip_diacritics(track))]
+    if '&' in artist:
+        candidates.append((_RE_AMP.sub(' and ', artist), track))
+    elif _RE_AND.search(artist):
+        candidates.append((_RE_AND.sub(' & ', artist), track))
+
+    for a, t in candidates:
+        key = ((a or '').lower(), (t or '').lower())
+        if a and t and key not in seen:
+            seen.add(key)
+            yield a, t
+
+
+def _search_with_fallbacks(artist, track):
+    """AudioDB search with progressive fallbacks for filename quirks."""
+    results = audiodb.search_tracks(artist, track)
+    if results:
+        return results
+
+    corrected = lastfm.get_track_info(artist, track)
+    if corrected:
+        c_artist = corrected.get('artist', '')
+        c_track = corrected.get('name', '')
+        if (c_artist and c_track
+                and (c_artist.lower() != artist.lower()
+                     or c_track.lower() != track.lower())):
+            log.debug('find: Last.fm corrected to "{}" - "{}"'.format(
+                c_artist, c_track))
+            results = audiodb.search_tracks(c_artist, c_track)
+            if results:
+                return results
+
+    for a, t in _query_variants(artist, track):
+        log.debug('find: variant retry "{}" - "{}"'.format(a, t))
+        results = audiodb.search_tracks(a, t)
+        if results:
+            return results
+
+    # Last.fm track.search recovers truncated artists (DB "X & Y" vs filename "X").
+    candidates = lastfm.search_tracks(track, artist, limit=5)
+    artist_lower = artist.lower()
+    for c_artist, c_track in candidates:
+        c_artist_lower = c_artist.lower()
+        if (artist_lower in c_artist_lower
+                or c_artist_lower in artist_lower
+                or _strip_diacritics(c_artist_lower)
+                == _strip_diacritics(artist_lower)):
+            if (c_artist.lower(), c_track.lower()) == (artist_lower,
+                                                       track.lower()):
+                continue
+            log.debug('find: track.search candidate "{}" - "{}"'.format(
+                c_artist, c_track))
+            results = audiodb.search_tracks(c_artist, c_track)
+            if results:
+                return results
+
+    return []
+
 
 def run_action(handle, action, params):
     """Dispatch a scraper action from Kodi."""
@@ -90,20 +164,7 @@ def _find(handle, params, settings):
         return
 
     log.debug('find: artist="{}" track="{}"'.format(artist, track))
-    results = audiodb.search_tracks(artist, track)
-
-    # Last.fm autocorrect retry: fixes punctuation/spelling mismatches
-    if not results:
-        corrected = lastfm.get_track_info(artist, track)
-        if corrected:
-            c_artist = corrected.get('artist', '')
-            c_track = corrected.get('name', '')
-            if (c_artist and c_track
-                    and (c_artist.lower() != artist.lower()
-                         or c_track.lower() != track.lower())):
-                log.debug('find: Last.fm corrected to "{}" - "{}"'.format(
-                    c_artist, c_track))
-                results = audiodb.search_tracks(c_artist, c_track)
+    results = _search_with_fallbacks(artist, track)
 
     if results:
         for t in results:
@@ -223,7 +284,8 @@ def _getdetails(handle, params, settings):
         settings,
     )
     set_artwork(
-        li.getVideoInfoTag(), track_data, artist_art, fanarttv_art,
+        li.getVideoInfoTag(), track_data, album_data,
+        artist_art, fanarttv_art, settings,
     )
     xbmcplugin.setResolvedUrl(handle, True, li)
 

@@ -58,6 +58,34 @@ def get_track_info(artist, track, lang='en'):
     return result
 
 
+def search_tracks(track, artist='', limit=5):
+    """Search by track name (artist optional). Returns list of (artist, name)."""
+    params = {'track': track, 'limit': limit}
+    if artist:
+        params['artist'] = artist
+    data = _request('track.search', params)
+    if not data:
+        return []
+
+    results = data.get('results') or {}
+    matches = results.get('trackmatches') or {}
+    raw = matches.get('track')
+    if isinstance(raw, dict):
+        raw = [raw]
+    if not isinstance(raw, list):
+        return []
+
+    out = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        a = item.get('artist', '')
+        n = item.get('name', '')
+        if a and n:
+            out.append((a, n))
+    return out
+
+
 def _parse_track(raw):
     """Normalize the API response into a flat dict."""
     wiki = raw.get('wiki') or {}
