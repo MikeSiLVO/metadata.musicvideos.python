@@ -52,6 +52,81 @@
                 </setting>
             </group>
         </category>
+        <category id="artwork" label="32300" help="">
+            <group id="1" label="32309">
+                <setting id="thumb_primary" type="string" label="32311" help="">
+                    <level>0</level>
+                    <default>screenshots</default>
+                    <constraints>
+                        <options>
+                            <option label="32301">screenshots</option>
+                            <option label="32302">album_cover</option>
+                            <option label="32303">artist_thumb</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>32311</heading>
+                    </control>
+                </setting>
+                <setting id="art_screenshots" type="boolean" label="32301" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="!is" setting="thumb_primary">screenshots</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
+                <setting id="art_album_thumb" type="boolean" label="32302" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="!is" setting="thumb_primary">album_cover</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
+                <setting id="art_thumb" type="boolean" label="32303" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="!is" setting="thumb_primary">artist_thumb</condition>
+                        </dependency>
+                    </dependencies>
+                </setting>
+            </group>
+            <group id="2" label="32310">
+                <setting id="art_fanart" type="boolean" label="32304" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="art_clearlogo" type="boolean" label="32305" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="art_banner" type="boolean" label="32306" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="art_clearart" type="boolean" label="32307" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="art_landscape" type="boolean" label="32308" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
         <category id="fanarttv" label="32100" help="">
             <group id="1">
                 <setting id="fanarttv_enabled" type="boolean" label="32101" help="">

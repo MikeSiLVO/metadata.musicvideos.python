@@ -67,3 +67,51 @@ msgstr ""
 msgctxt "#32201"
 msgid "Verbose logging"
 msgstr ""
+
+msgctxt "#32300"
+msgid "Artwork"
+msgstr ""
+
+msgctxt "#32301"
+msgid "Music video screenshots"
+msgstr ""
+
+msgctxt "#32302"
+msgid "Album cover as thumbnail"
+msgstr ""
+
+msgctxt "#32303"
+msgid "Artist thumbnail"
+msgstr ""
+
+msgctxt "#32304"
+msgid "Fanart"
+msgstr ""
+
+msgctxt "#32305"
+msgid "Clearlogo"
+msgstr ""
+
+msgctxt "#32306"
+msgid "Banner"
+msgstr ""
+
+msgctxt "#32307"
+msgid "Clearart"
+msgstr ""
+
+msgctxt "#32308"
+msgid "Landscape"
+msgstr ""
+
+msgctxt "#32309"
+msgid "Thumbnail sources"
+msgstr ""
+
+msgctxt "#32310"
+msgid "Other art types"
+msgstr ""
+
+msgctxt "#32311"
+msgid "Preferred thumbnail"
+msgstr ""

@@ -53,6 +53,15 @@ def get_settings():
         'enable_wiki': _bool('wiki_enabled', True),
         'lastfm_tags': _bool('lastfm_tags', True),
         'filename_format': _str('filename_format', 'artist_track'),
+        'thumb_primary': _str('thumb_primary', 'screenshots'),
+        'art_screenshots': _bool('art_screenshots', True),
+        'art_album_thumb': _bool('art_album_thumb', True),
+        'art_thumb': _bool('art_thumb', True),
+        'art_fanart': _bool('art_fanart', True),
+        'art_clearlogo': _bool('art_clearlogo', True),
+        'art_banner': _bool('art_banner', True),
+        'art_clearart': _bool('art_clearart', True),
+        'art_landscape': _bool('art_landscape', True),
         'verbose_log': _bool('log_verbose'),
     }
 
