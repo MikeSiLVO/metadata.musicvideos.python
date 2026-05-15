@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout addon
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: addon
 
@@ -43,7 +43,7 @@ jobs:
           rm -f .DS_Store Thumbs.db desktop.ini
 
       - name: Checkout repo-scrapers fork
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: MikeSiLVO/repo-scrapers
           ref: ${{ inputs.branch }}
