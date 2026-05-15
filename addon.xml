@@ -15,6 +15,6 @@
     <license>GPL-3.0-or-later</license>
     <summary lang="en_GB">Multi-source music video scraper</summary>
     <description lang="en_GB">Music video metadata from TheAudioDB, Last.fm, Wikipedia, and Fanart.tv.</description>
-    <news>v1.0.3 - Search robustness (diacritics, ampersands, truncated artists); album cover as thumbnail; per-artwork toggles; non-English Wikipedia coverage improvements</news>
+    <news>v1.0.3 - Search robustness (accents, ampersands, truncated artist names); album cover as thumbnail; selectable primary thumb source; per-artwork toggles</news>
   </extension>
 </addon>
