@@ -24,11 +24,6 @@ def _lru_set(cache, key, value):
     cache[key] = value
 
 
-def normalize_url(url):
-    """Normalize an image URL from the API response."""
-    return url or ''
-
-
 def normalize_quotes(text):
     """Replace smart quotes with ASCII equivalents for API queries."""
     if not text:
@@ -132,7 +127,6 @@ def get_track_screenshots(track):
     for suffix in [''] + list(range(2, 13)):
         url = track.get('strMusicVidScreen{}'.format(suffix))
         if url:
-            url = normalize_url(url)
             screens.append((url, '{}/preview'.format(url)))
     return screens
 
@@ -158,7 +152,6 @@ def get_artist_artwork(artist):
     for api_key, art_type in _ARTIST_ART_MAPPING.items():
         url = artist.get(api_key)
         if url:
-            url = normalize_url(url)
             preview = '{}/preview'.format(url)
             result.setdefault(art_type, []).append((url, preview))
     return result

@@ -235,9 +235,6 @@ def _getdetails(handle, params, settings):
     artist_data = None
     album_data = None
 
-    def _fetch_lastfm():
-        return lastfm.get_track_info(artist_name, track_name, lang)
-
     def _fetch_wiki():
         if not settings.get('enable_wiki', True):
             return None
@@ -248,19 +245,17 @@ def _getdetails(handle, params, settings):
             return {}
         return fanarttv.get_artist_artwork(mbid_artist, settings)
 
-    def _fetch_artist():
-        return audiodb.search_artist(artist_name)
-
     def _fetch_album():
         if not album_id:
             return None
         return audiodb.get_album(album_id)
 
     with ThreadPoolExecutor(max_workers=5) as executor:
-        fut_lastfm = executor.submit(_fetch_lastfm)
+        fut_lastfm = executor.submit(
+            lastfm.get_track_info, artist_name, track_name, lang)
         fut_wiki = executor.submit(_fetch_wiki)
         fut_fanarttv = executor.submit(_fetch_fanarttv)
-        fut_artist = executor.submit(_fetch_artist)
+        fut_artist = executor.submit(audiodb.search_artist, artist_name)
         fut_album = executor.submit(_fetch_album)
 
         lastfm_data = _safe_result(fut_lastfm, 'lastfm')
